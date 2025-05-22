@@ -531,6 +531,25 @@
   - RMCLoadoutGroupPins
 
 - type: roleLoadout
+  id: JobCMMilitaryCorrespondent
+  points: 7
+  groups:
+  - MarineLeatherBackpack
+  - HeadwearRMC
+  - EyewearRMC
+  - MasksRMC
+  - HelmetGarbsRMC
+  - PaperworkRMC
+  - PlushiesRMC
+  - WeaponsRMC
+  - CannedDrinksRMC
+  - FlasksRMC
+  - FoodSweetsRMC
+  - FoodPackagedRMC
+  - FoodHealthyRMC
+  - RMCLoadoutGroupPins
+  
+- type: roleLoadout
   id: JobCMLiaison
   points: 7
   groups:

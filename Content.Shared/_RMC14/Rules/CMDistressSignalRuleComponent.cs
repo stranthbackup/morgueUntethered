@@ -99,6 +99,16 @@ public sealed partial class CMDistressSignalRuleComponent : Component
     public EntProtoId? LandingZoneGas = "RMCLandingZoneGas";
 
     [DataField]
+    public ProtoId<JobPrototype> BaseCorrespondentJob = "CMCorrespondent";
+
+    [DataField]
+    public List<(ProtoId<JobPrototype> Job, int Amount)> CorrespondentJobs = new()
+    {
+        ("CMCivilianCorrespondent", 1),
+        ("CMMilitaryCorrespondent", 1),
+    };
+
+    [DataField]
     public ProtoId<JobPrototype> CivilianSurvivorJob = "CMSurvivor";
 
     [DataField]
