@@ -1,9 +1,9 @@
-﻿- type: job
+- type: job
   parent: CMJobBase
-  id: CMCorrespondent
-  name: cm-job-name-correspondent
-  description: cm-job-description-correspondent
-  playTimeTracker: CMJobCorrespondent
+  id: CMCivilianCorrespondent
+  name: cm-job-name-civilian-correspondent
+  description: cm-job-description-civilian-correspondent
+  playTimeTracker: CMJobCivilianCorrespondent
   requirements:
   - !type:TotalDepartmentsTimeRequirement
     group: CMDepartmentsHuman
@@ -15,7 +15,7 @@
   joinNotifyCrew: false
   supervisors: cm-job-supervisors-co
   accessGroups:
-  - CMCorrespondent
+  - ColonyCorrespondent
   roleWeight: 0.25
   special:
   - !type:AddComponentSpecial
@@ -26,24 +26,73 @@
         RMCSkillFirearms: 0
         RMCSkillVehicles: 1
     - type: JobPrefix
-      prefix: cm-job-prefix-correspondent # TODO RMC14 combat correspondent is CC
+      prefix: cm-job-prefix-correspondent
     - type: TacticalMapIcon
       icon:
         sprite: _RMC14/Interface/map_blips.rsi
         state: correspondent
   hasIcon: false
+  hidden: true
+  
+- type: job
+  parent: CMJobBase
+  id: CMMilitaryCorrespondent
+  name: cm-job-name-military-correspondent
+  description: cm-job-description-military-correspondent
+  playTimeTracker: CMJobMilitaryCorrespondent
+  requirements:
+  - !type:TotalDepartmentsTimeRequirement
+    group: CMDepartmentsHuman
+    time: 36000 # 10 hours
+  ranks:
+    RMCRankCorporal: []
+  startingGear: CMGearMilitaryCorrespondent
+  icon: "CMJobIconEmpty"
+  joinNotifyCrew: false
+  supervisors: cm-job-supervisors-co
+  accessGroups:
+  - CMCorrespondent
+  roleWeight: 0.25
+  special:
+  - !type:AddComponentSpecial
+    components:
+    - type: Skills
+      skills:
+        RMCSkillEndurance: 1
+        RMCSkillFirearms: 1   
+    - type: JobPrefix
+      prefix: cm-job-prefix-military-correspondent
+    - type: TacticalMapIcon
+      icon:
+        sprite: _RMC14/Interface/map_blips.rsi
+        state: correspondent
+  hasIcon: false
+  hidden: true
+  
+- type: job
+  parent: CMJobBase
+  id: CMCorrespondent
+  name: cm-job-name-base-correspondent
+  description: cm-job-description-base-correspondent
+  playTimeTracker: CMJobCorrespondent
+  jobVariants:
+    - CMCivilianCorrespondent
+    - CMMilitaryCorrespondent
+  hidden: false
 
 - type: startingGear
-  id: CMGearCorrespondent
+  id: CMGearMilitaryCorrespondent
   equipment:
-    jumpsuit: RMCJumpsuitCorrespondent
-    outerClothing: RMCCoatCorrespondent
-    shoes: RMCShoesLaceup
-    id: CMIDCardCorrespondent
+    head: RMCHeadCapFlippable
+    jumpsuit: JumpsuitMarineWebbingBrown
+    shoes: CMBootsBlackFilled
+    id: CMDogtagCorrespondent
     ears: CMHeadsetReporter
-    #    belt: CMCamera TODO RMC14
-    pocket1: RMCPouchGeneralLarge
-    pocket2: RMCCorrespondentMicrophone
+    belt: RMCM1984BeltFilled
+    pocket1: RMCPouchGeneralMedium
+    pocket2: RMCPouchGeneralMedium
+  inhand: 
+  - RMCCameraBroadcasting
 
 - type: entity
   parent: CMSpawnPointJobBase
@@ -54,7 +103,21 @@
     job_id: CMCorrespondent
   - type: Sprite
     state: marine_spawn
+    
+#- type: entity
+#  parent: CMSpawnPointJobBase
+#  id: CMSpawnPointMilitaryCorrespondent
+#  name: military correspondent spawn point
+#  components:
+#  - type: SpawnPoint
+#    job_id: CMMilitaryCorrespondent
+#  - type: Sprite
+#    state: marine_spawn
 
 - type: playTimeTracker
   id: CMJobCorrespondent
+  isHumanoid: true
+
+- type: playTimeTracker
+  id: CMJobMilitaryCorrespondent
   isHumanoid: true

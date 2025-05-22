@@ -47,6 +47,12 @@ namespace Content.Shared.Preferences
         };
 
         /// <summary>
+        /// Job variants we prefer for the initial job.
+        /// </summary>
+        [DataField]
+        private Dictionary<ProtoId<JobPrototype>, ProtoId<JobPrototype>> _preferredJobVariants = new();
+
+        /// <summary>
         /// Antags we have opted in to.
         /// </summary>
         [DataField]
@@ -125,6 +131,11 @@ namespace Content.Shared.Preferences
         public IReadOnlyDictionary<ProtoId<JobPrototype>, JobPriority> JobPriorities => _jobPriorities;
 
         /// <summary>
+        /// <see cref="_prefferedJobVariants"/>
+        /// </summary>
+        public IReadOnlyDictionary<ProtoId<JobPrototype>, ProtoId<JobPrototype>> PreferredJobVariants => _preferredJobVariants;
+
+        /// <summary>
         /// <see cref="_antagPreferences"/>
         /// </summary>
         public IReadOnlySet<ProtoId<AntagPrototype>> AntagPreferences => _antagPreferences;
@@ -172,7 +183,8 @@ namespace Content.Shared.Preferences
             SharedRMCNamedItems namedItems,
             bool playtimePerks,
             string xenoPrefix,
-            string xenoPostfix)
+            string xenoPostfix,
+            Dictionary<ProtoId<JobPrototype>, ProtoId<JobPrototype>> preferredJobVariants)
         {
             Name = name;
             FlavorText = flavortext;
@@ -189,6 +201,7 @@ namespace Content.Shared.Preferences
             _antagPreferences = antagPreferences;
             _traitPreferences = traitPreferences;
             _loadouts = loadouts;
+            _preferredJobVariants = preferredJobVariants;
 
             var hasHighPrority = false;
             foreach (var (key, value) in _jobPriorities)
@@ -230,7 +243,8 @@ namespace Content.Shared.Preferences
                 other.NamedItems,
                 other.PlaytimePerks,
                 other.XenoPrefix,
-                other.XenoPostfix)
+                other.XenoPostfix,
+                new Dictionary<ProtoId<JobPrototype>, ProtoId<JobPrototype>>(other.PreferredJobVariants))
         {
         }
 
@@ -427,7 +441,20 @@ namespace Content.Shared.Preferences
                 _jobPriorities = dictionary,
             };
         }
+        public HumanoidCharacterProfile WithJobVariant(ProtoId<JobPrototype> jobId, ProtoId<JobPrototype>? variant)
+        {
+            var dictionary = new Dictionary<ProtoId<JobPrototype>, ProtoId<JobPrototype>>(_preferredJobVariants);
 
+            if (variant == null)
+                dictionary.Remove(jobId);
+            else
+                dictionary[jobId] = variant.Value;
+
+            return new(this)
+            {
+                _preferredJobVariants = dictionary,
+            };
+        }
         public HumanoidCharacterProfile WithPreferenceUnavailable(PreferenceUnavailableMode mode)
         {
             return new(this) { PreferenceUnavailable = mode };
@@ -547,6 +574,7 @@ namespace Content.Shared.Preferences
             if (PlaytimePerks != other.PlaytimePerks) return false;
             if (XenoPrefix != other.XenoPrefix) return false;
             if (XenoPostfix != other.XenoPostfix) return false;
+            if (!_preferredJobVariants.SequenceEqual(other._preferredJobVariants)) return false;
             return Appearance.MemberwiseEquals(other.Appearance);
         }
 
@@ -694,6 +722,21 @@ namespace Content.Shared.Preferences
             };
 
             ArmorPreference = armorPreference;
+
+            var jobVariants = new Dictionary<ProtoId<JobPrototype>, ProtoId<JobPrototype>>(PreferredJobVariants
+                .Where(p =>
+                    prototypeManager.TryIndex<JobPrototype>(p.Value, out _) &&
+                    prototypeManager.TryIndex<JobPrototype>(p.Key, out var job) &&
+                    job.JobVariants is not null
+                )
+            );
+
+            _preferredJobVariants.Clear();
+
+            foreach ( var (job, variant) in jobVariants )
+            {
+                _preferredJobVariants.Add(job, variant);
+            }
 
             if (!prototypeManager.TryIndex(SquadPreference, out var squad) ||
                 !squad.TryGetComponent(out SquadTeamComponent? team, compFactory) ||
@@ -871,6 +914,7 @@ namespace Content.Shared.Preferences
             hashCode.Add(PlaytimePerks);
             hashCode.Add(XenoPrefix);
             hashCode.Add(XenoPostfix);
+            hashCode.Add(_preferredJobVariants);
             return hashCode.ToHashCode();
         }
 

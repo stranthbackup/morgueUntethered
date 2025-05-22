@@ -7,6 +7,7 @@ using Content.Client.Lobby.UI;
 using Content.Client.Players.PlayTimeTracking;
 using Content.Client.Station;
 using Content.Shared._RMC14.Armor;
+using Content.Shared._RMC14.Rules;
 using Content.Shared.CCVar;
 using Content.Shared.Clothing;
 using Content.Shared.GameTicking;
@@ -47,6 +48,7 @@ public sealed class LobbyUIController : UIController, IOnStateEntered<LobbyState
     [UISystemDependency] private readonly StationSpawningSystem _spawn = default!;
     [UISystemDependency] private readonly GuidebookSystem _guide = default!;
     [UISystemDependency] private readonly CMArmorSystem _armorSystem = default!;
+    [UISystemDependency] private readonly SharedCMDistressSignalSystem _sharedCMDistress = default!;
 
     private CharacterSetupGui? _characterSetup;
     private HumanoidProfileEditor? _profileEditor;
@@ -437,6 +439,11 @@ public sealed class LobbyUIController : UIController, IOnStateEntered<LobbyState
         if (!_prototypeManager.TryIndex(job.StartingGear, out var gear))
             return;
 
+        if (_sharedCMDistress.GetPreferredJobVariant(profile, job, out var jobVariant) && jobVariant.StartingGear != null)
+        {
+            if(_prototypeManager.TryIndex(jobVariant.StartingGear, out var newGear))
+                gear = newGear;
+        }
         _prototypeManager.TryIndex(job.DummyStartingGear, out var dummyGear);
 
         foreach (var slot in slots)

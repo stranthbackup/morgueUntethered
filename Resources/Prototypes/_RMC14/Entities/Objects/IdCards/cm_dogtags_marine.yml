@@ -53,3 +53,11 @@
   components:
   - type: PresetIdCard
     job: CMWeaponsSpecialist
+
+- type: entity
+  parent: CMIDCardStandardDogtag
+  id: CMDogtagCorrespondent
+  name: Military Correspondent's dogtags
+  components:
+  - type: PresetIdCard
+    job: CMMilitaryCorrespondent

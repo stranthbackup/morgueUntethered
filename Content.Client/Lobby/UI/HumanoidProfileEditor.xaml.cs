@@ -22,6 +22,7 @@ using Content.Shared.Guidebook;
 using Content.Shared.Humanoid;
 using Content.Shared.Humanoid.Markings;
 using Content.Shared.Humanoid.Prototypes;
+using Content.Shared.Interaction.Events;
 using Content.Shared.Preferences;
 using Content.Shared.Preferences.Loadouts;
 using Content.Shared.Roles;
@@ -1075,6 +1076,65 @@ namespace Content.Client.Lobby.UI
                         VerticalAlignment = VAlignment.Center,
                         Margin = new Thickness(3f, 3f, 0f, 0f),
                     };
+
+                    var variants = new List<ProtoId<JobPrototype>>();
+
+                    if (job.JobVariants != null)
+                    {
+                        var jobVariantsSelector = new OptionButton()
+                        {
+                            HorizontalAlignment = HAlignment.Right,
+                            VerticalAlignment = VAlignment.Center,
+                            Margin = new Thickness(3f, 3f, 0f, 0f),
+                        };
+
+                        jobVariantsSelector.AddItem(Loc.GetString("loadout-none"), 0);
+
+                        for (var i = 0; i < job.JobVariants.Count; i++)
+                        {
+                            var variantId = job.JobVariants.ElementAt(i);
+                            var proto = _prototypeManager.Index(variantId);
+
+                            if (proto == null)
+                                continue;
+
+                            variants.Add(variantId);
+
+                            jobVariantsSelector.AddItem(proto.LocalizedName, i + 1);
+
+                            if (Profile != null && Profile.PreferredJobVariants.TryGetValue(job.ID, out var selectedVariant))
+                            {
+                                if (selectedVariant.Id == variants[i].Id)
+                                    jobVariantsSelector.SelectId(i + 1);
+                            }
+                        }
+
+                        jobVariantsSelector.OnItemSelected += args =>
+                        {
+                            jobVariantsSelector.SelectId(args.Id);
+
+                            if (args.Id == 0)
+                            {
+                                Profile = Profile?.WithJobVariant(job.ID, null);
+                                JobOverride = null;
+                                return;
+                            }
+
+                            var jobProtoId = variants[args.Id - 1];
+                            var jobProto = _prototypeManager.Index(jobProtoId);
+
+                            if (jobProto == null)
+                                return;
+
+                            Profile = Profile?.WithJobVariant(job.ID, jobProtoId);
+                            JobOverride = jobProto;
+
+                            ReloadPreview();
+                            SetDirty();
+                        };
+
+                        jobContainer.AddChild(jobVariantsSelector);
+                    }
 
                     var collection = IoCManager.Instance!;
                     var protoManager = collection.Resolve<IPrototypeManager>();
