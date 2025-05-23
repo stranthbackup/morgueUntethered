@@ -731,9 +731,16 @@ namespace Content.Shared.Preferences
                 )
             );
 
+            _jobPriorities.Clear();
+
+            foreach (var (job, priority) in priorities)
+            {
+                _jobPriorities.Add(job, priority);
+            }
+
             _preferredJobVariants.Clear();
 
-            foreach ( var (job, variant) in jobVariants )
+            foreach (var (job, variant) in jobVariants)
             {
                 _preferredJobVariants.Add(job, variant);
             }
@@ -743,13 +750,6 @@ namespace Content.Shared.Preferences
                 !team.RoundStart)
             {
                 SquadPreference = null;
-            }
-
-            _jobPriorities.Clear();
-
-            foreach (var (job, priority) in priorities)
-            {
-                _jobPriorities.Add(job, priority);
             }
 
             PreferenceUnavailable = prefsUnavailableMode;

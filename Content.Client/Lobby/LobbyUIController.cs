@@ -444,6 +444,7 @@ public sealed class LobbyUIController : UIController, IOnStateEntered<LobbyState
             if(_prototypeManager.TryIndex(jobVariant.StartingGear, out var newGear))
                 gear = newGear;
         }
+
         _prototypeManager.TryIndex(job.DummyStartingGear, out var dummyGear);
 
         foreach (var slot in slots)

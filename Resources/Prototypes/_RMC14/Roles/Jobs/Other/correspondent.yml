@@ -10,7 +10,7 @@
     time: 36000 # 10 hours
   ranks:
     RMCRankCivilian: []
-  startingGear: CMGearCorrespondent
+  startingGear: CMGearCivilianCorrespondent
   icon: "CMJobIconEmpty"
   joinNotifyCrew: false
   supervisors: cm-job-supervisors-co
@@ -71,7 +71,7 @@
   hidden: true
   
 - type: job
-  parent: CMJobBase
+  parent: CMCivilianCorrespondent
   id: CMCorrespondent
   name: cm-job-name-base-correspondent
   description: cm-job-description-base-correspondent
@@ -79,6 +79,7 @@
   jobVariants:
     - CMCivilianCorrespondent
     - CMMilitaryCorrespondent
+  hasIcon: false
   hidden: false
 
 - type: startingGear
@@ -95,6 +96,19 @@
   inhand: 
   - RMCCameraBroadcasting
 
+- type: startingGear
+  id: CMGearCivilianCorrespondent
+  equipment:
+    jumpsuit: RMCJumpsuitCorrespondent
+    outerClothing: RMCCoatCorrespondent
+    shoes: RMCShoesLaceup
+    id: CMIDCardCorrespondent
+    ears: CMHeadsetReporter
+    pocket1: RMCPouchGeneralLarge
+    pocket2: RMCCorrespondentMicrophone
+  inhand: 
+  - RMCCameraBroadcasting  
+  
 - type: entity
   parent: CMSpawnPointJobBase
   id: CMSpawnPointCorrespondent
@@ -115,10 +129,24 @@
 #  - type: Sprite
 #    state: marine_spawn
 
+#- type: entity
+#  parent: CMSpawnPointJobBase
+#  id: CMSpawnPointCivilianCorrespondent
+#  name: civilian correspondent spawn point
+#  components:
+#  - type: SpawnPoint
+#    job_id: CMCivilianCorrespondent
+#  - type: Sprite
+#    state: marine_spawn
+
 - type: playTimeTracker
   id: CMJobCorrespondent
   isHumanoid: true
-
+  
+- type: playTimeTracker
+  id: CMJobCivilianCorrespondent
+  isHumanoid: true
+  
 - type: playTimeTracker
   id: CMJobMilitaryCorrespondent
   isHumanoid: true

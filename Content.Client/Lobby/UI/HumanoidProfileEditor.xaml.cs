@@ -1077,6 +1077,39 @@ namespace Content.Client.Lobby.UI
                         Margin = new Thickness(3f, 3f, 0f, 0f),
                     };
 
+
+
+                    var collection = IoCManager.Instance!;
+                    var protoManager = collection.Resolve<IPrototypeManager>();
+
+                    // If no loadout found then disabled button
+                    if (!protoManager.TryIndex<RoleLoadoutPrototype>(LoadoutSystem.GetJobPrototype(job.ID), out var roleLoadoutProto))
+                    {
+                        loadoutWindowBtn.Disabled = true;
+                    }
+                    // else
+                    else
+                    {
+                        loadoutWindowBtn.OnPressed += args =>
+                        {
+                            RoleLoadout? loadout = null;
+
+                            // Clone so we don't modify the underlying loadout.
+                            Profile?.Loadouts.TryGetValue(LoadoutSystem.GetJobPrototype(job.ID), out loadout);
+                            loadout = loadout?.Clone();
+
+                            if (loadout == null)
+                            {
+                                loadout = new RoleLoadout(roleLoadoutProto.ID);
+                                loadout.SetDefault(Profile, _playerManager.LocalSession, _prototypeManager);
+                            }
+
+                            OpenLoadout(job, loadout, roleLoadoutProto);
+                        };
+                    }
+
+                    _jobPriorities.Add((job.ID, selector));
+                    jobContainer.AddChild(selector);
                     var variants = new List<ProtoId<JobPrototype>>();
 
                     if (job.JobVariants != null)
@@ -1135,38 +1168,6 @@ namespace Content.Client.Lobby.UI
 
                         jobContainer.AddChild(jobVariantsSelector);
                     }
-
-                    var collection = IoCManager.Instance!;
-                    var protoManager = collection.Resolve<IPrototypeManager>();
-
-                    // If no loadout found then disabled button
-                    if (!protoManager.TryIndex<RoleLoadoutPrototype>(LoadoutSystem.GetJobPrototype(job.ID), out var roleLoadoutProto))
-                    {
-                        loadoutWindowBtn.Disabled = true;
-                    }
-                    // else
-                    else
-                    {
-                        loadoutWindowBtn.OnPressed += args =>
-                        {
-                            RoleLoadout? loadout = null;
-
-                            // Clone so we don't modify the underlying loadout.
-                            Profile?.Loadouts.TryGetValue(LoadoutSystem.GetJobPrototype(job.ID), out loadout);
-                            loadout = loadout?.Clone();
-
-                            if (loadout == null)
-                            {
-                                loadout = new RoleLoadout(roleLoadoutProto.ID);
-                                loadout.SetDefault(Profile, _playerManager.LocalSession, _prototypeManager);
-                            }
-
-                            OpenLoadout(job, loadout, roleLoadoutProto);
-                        };
-                    }
-
-                    _jobPriorities.Add((job.ID, selector));
-                    jobContainer.AddChild(selector);
                     jobContainer.AddChild(loadoutWindowBtn);
                     category.AddChild(jobContainer);
                 }
